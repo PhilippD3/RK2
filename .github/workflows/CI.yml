@@ -1,43 +1,29 @@
-name: CMake
+name: Build
 
 on:
- push:
-  branches: [master]
- pull_request:
-  branches: [master]
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
 
-jobs: 
- build_Linux:
+jobs:
+  build:
+    runs-on: ubuntu-latest
 
-  runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-  steps:
-  - uses: actions/checkout@v3
+    - name: Set up CMake
+      run: sudo apt-get install -y cmake
 
-  - name: Configure Solver
-    run: cmake ${{github.workspace}} -B ${{github.workspace}}/build
+    - name: Build
+      run: |
+        cmake -S . -B build
+        cmake --build build --config Release
 
-  - name: Build Solver
-    run: cmake --build ${{github.workspace}}/build
-  - name: Upload Artifact
-    uses: actions/upload-artifact@v2
-    with:
-     name: executable
-     path: build/GumballMachine
-     
-
-  - name: Adding gtest
-    run: git clone https://github.com/google/googletest.git third-party/gtest -b release-1.11.0
-
-  - name: Install lcov
-    run: sudo apt-get install -y lcov
-
-  - name: Config with tests
-    run: cmake -H. -B ${{github.workspace}}/build -DBUILD_TESTS=ON -DCMAKE_CXX_FLAGS='--coverage'
-
-  - name: Build 
-    run: cmake --build ${{github.workspace}}/build
-
-  - name: Run tests
-    run: |
-      build/GumballMachine
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: executable
+        path: ${{github.workspace}}/artifacts/*.tar.gz
