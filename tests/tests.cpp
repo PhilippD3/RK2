@@ -1,38 +1,30 @@
-#include <gtest/gtest.h>
-#include <gmock/gmock.h>
+#include "gtest/gtest.h"
+#include "gmock/gmock.h"
+#include "IReciever.h"
+#include "ConcreteRecieverY.h"
 
-#include "ConcreteReciever.h"
-
-
-
-class MockState : public ConcreteReciever {
+class MockReciever : public IReciever {
 public:
-  MOCK_METHOD0(insertCoin, void());
-  MOCK_METHOD0(ejectQuarter, void());
-  MOCK_METHOD0(turnCrank, void());
-  MOCK_METHOD0(dispense, void());
+    MOCK_METHOD0(performTask, void() const);
 };
 
-TEST(ConcreteRecieverTest, InsertCoin) {
-  MockState ConcreteReciever;
+TEST(IRecieverTest, PerformTask_CallsPerformTaskMethod) {
+    MockReciever mockReciever;
+    EXPECT_CALL(mockReciever, performTask()).Times(1);
 
-  EXPECT_CALL(ConcreteReciever, insertCoin()).Times(1);
-
-  ConcreteReciever.insertCoin();
+    mockReciever.performTask();
 }
 
-TEST(ConcreteRecieverTest, EjectQuarter) {
-  MockState ConcreteReciever;
+TEST(ConcreteRecieverYTest, PerformTask_CallsPerformTaskMethod) {
+    ConcreteRecieverY concreteRecieverY;
+    // В этом тесте не проверяется реализация performTask() в ConcreteRecieverY, 
+    // но проверяется, что метод virtual был вызван.
+    EXPECT_CALL(concreteRecieverY, performTask()).Times(1);
 
-  EXPECT_CALL(ConcreteReciever, ejectQuarter()).Times(1);
-
-  ConcreteReciever.ejectQuarter();
+    concreteRecieverY.performTask();
 }
 
-TEST(ConcreteRecieverTest, TurnCrank) {
-  MockState ConcreteReciever;
-
-  EXPECT_CALL(ConcreteReciever, turnCrank()).Times(1);
-
-  ConcreteReciever.turnCrank();
+TEST(IRecieverTest, Destructor_DoesNotThrowException) {
+    MockReciever* mockReciever = new MockReciever();
+    delete mockReciever;
 }
